@@ -56,6 +56,7 @@ export default function LibrarySection() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null)
   const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [downloadingId, setDownloadingId] = useState<number | null>(null)
 
   const filtered = MOCK_VIDEOS.filter(v => {
     const matchesSearch = !search || v.title.toLowerCase().includes(search.toLowerCase())
@@ -71,6 +72,11 @@ export default function LibrarySection() {
     navigator.clipboard.writeText(video.caption).catch(() => {})
     setCopiedId(video.id)
     setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const handleDownload = (video: VideoItem) => {
+    setDownloadingId(video.id)
+    setTimeout(() => setDownloadingId(null), 2500)
   }
 
   const statusCounts = {
@@ -236,8 +242,8 @@ export default function LibrarySection() {
                 <Button variant="outline" className="flex-1 border-border text-foreground hover:bg-muted gap-2" onClick={() => handleCopy(selectedVideo)}>
                   {copiedId === selectedVideo.id ? <><FiCheck className="h-4 w-4" /> Copied</> : <><FiCopy className="h-4 w-4" /> Copy Caption</>}
                 </Button>
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
-                  <FiDownload className="h-4 w-4" /> Download
+                <Button onClick={() => handleDownload(selectedVideo)} disabled={downloadingId === selectedVideo.id} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+                  {downloadingId === selectedVideo.id ? <><FiCheck className="h-4 w-4" /> Downloading...</> : <><FiDownload className="h-4 w-4" /> Download</>}
                 </Button>
               </div>
             </div>

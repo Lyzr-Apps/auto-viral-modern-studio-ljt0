@@ -63,10 +63,20 @@ function queueIcon(status: string) {
   return FiCheck
 }
 
+interface QueueItem {
+  id: number
+  title: string
+  platform: string
+  scheduledTime: string
+  status: string
+  type: string
+}
+
 export default function SchedulerSection() {
   const [selectedDays, setSelectedDays] = useState<string[]>(['Mon', 'Wed', 'Fri'])
   const [postTime, setPostTime] = useState('18:00')
   const [selectedNiche, setSelectedNiche] = useState('AI/Tech')
+  const [queueItems, setQueueItems] = useState<QueueItem[]>(MOCK_QUEUE)
   const [videosPerDay, setVideosPerDay] = useState(2)
   const [platformToggles, setPlatformToggles] = useState<Record<string, boolean>>({ instagram: true, tiktok: true, youtube: false, facebook: false })
   const [saved, setSaved] = useState(false)
@@ -78,6 +88,17 @@ export default function SchedulerSection() {
   const handleSave = () => {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleRetryPost = (id: number) => {
+    setQueueItems(prev => prev.map(item =>
+      item.id === id ? { ...item, status: 'Generating' } : item
+    ))
+    setTimeout(() => {
+      setQueueItems(prev => prev.map(item =>
+        item.id === id ? { ...item, status: 'Ready' } : item
+      ))
+    }, 2500)
   }
 
   const activePlatformCount = Object.values(platformToggles).filter(Boolean).length
@@ -213,9 +234,9 @@ export default function SchedulerSection() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-semibold text-foreground">Post Queue</CardTitle>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">{MOCK_QUEUE.filter(q => q.status === 'Ready').length} ready</Badge>
-              {MOCK_QUEUE.some(q => q.status === 'Failed') && (
-                <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive">{MOCK_QUEUE.filter(q => q.status === 'Failed').length} failed</Badge>
+              <Badge variant="outline" className="text-[10px] border-accent/30 text-accent">{queueItems.filter(q => q.status === 'Ready').length} ready</Badge>
+              {queueItems.some(q => q.status === 'Failed') && (
+                <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive">{queueItems.filter(q => q.status === 'Failed').length} failed</Badge>
               )}
             </div>
           </div>
@@ -223,7 +244,7 @@ export default function SchedulerSection() {
         <CardContent>
           <ScrollArea className="h-[280px]">
             <div className="space-y-2">
-              {MOCK_QUEUE.map(item => {
+              {queueItems.map(item => {
                 const StatusIcon = queueIcon(item.status)
                 return (
                   <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-all group">
@@ -236,7 +257,7 @@ export default function SchedulerSection() {
                     </div>
                     <Badge className={`${queueStatusStyle(item.status)} text-[10px] border-0`}>{item.status}</Badge>
                     {item.status === 'Failed' && (
-                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleRetryPost(item.id); }} className="text-muted-foreground hover:text-foreground h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity" title="Retry posting">
                         <FiRefreshCw className="h-3.5 w-3.5" />
                       </Button>
                     )}

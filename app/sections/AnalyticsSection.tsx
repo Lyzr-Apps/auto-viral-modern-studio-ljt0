@@ -100,7 +100,11 @@ function heatColor(value: number): string {
 
 type TabKey = 'hooks' | 'ab' | 'strategy' | 'next'
 
-export default function AnalyticsSection() {
+interface AnalyticsSectionProps {
+  onNavigateToCreate?: (topic: string) => void
+}
+
+export default function AnalyticsSection({ onNavigateToCreate }: AnalyticsSectionProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<OptimizerData | null>(null)
@@ -441,7 +445,7 @@ export default function AnalyticsSection() {
                       <p className="text-xs text-foreground italic">&quot;{s?.hook ?? ''}&quot;</p>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">{s?.rationale ?? ''}</p>
-                    <Button size="sm" className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground text-xs h-8 transition-all gap-1 group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Button size="sm" onClick={() => onNavigateToCreate?.(s?.topic ?? '')} className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground text-xs h-8 transition-all gap-1 group-hover:bg-primary group-hover:text-primary-foreground">
                       Create This Video <FiArrowRight className="h-3 w-3" />
                     </Button>
                   </CardContent>

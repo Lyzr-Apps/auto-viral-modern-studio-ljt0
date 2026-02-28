@@ -154,7 +154,7 @@ export default function DashboardSection({ onNavigateToTab }: DashboardSectionPr
           <CardContent className="pt-0">
             <div className="space-y-2">
               {MOCK_VIDEOS.map((video) => (
-                <div key={video.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all cursor-pointer group">
+                <div key={video.id} onClick={() => onNavigateToTab('library')} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all cursor-pointer group">
                   <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0 group-hover:bg-primary/10 transition-colors">
                     <FiPlay className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>

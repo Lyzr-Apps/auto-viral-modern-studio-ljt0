@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { callAIAgent } from '@/lib/aiAgent'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -98,11 +98,14 @@ export default function CreateVideoSection({ onNavigateToTab, prefillTopic }: Cr
 
   const [renderPhase, setRenderPhase] = useState<'idle' | 'rendering' | 'done'>('idle')
   const [renderProgress, setRenderProgress] = useState(0)
+  const renderIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const [captionLoading, setCaptionLoading] = useState(false)
   const [captionError, setCaptionError] = useState<string | null>(null)
   const [captionData, setCaptionData] = useState<PlatformCaption[]>([])
   const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null)
+  const [downloadStarted, setDownloadStarted] = useState(false)
+  const [posted, setPosted] = useState(false)
 
   useEffect(() => {
     if (prefillTopic) setTopic(prefillTopic)
@@ -139,16 +142,33 @@ export default function CreateVideoSection({ onNavigateToTab, prefillTopic }: Cr
     }
   }
 
-  const handleRender = () => {
+  const handleRender = useCallback(() => {
+    if (renderIntervalRef.current) clearInterval(renderIntervalRef.current)
     setRenderPhase('rendering')
     setRenderProgress(0)
-    const interval = setInterval(() => {
-      setRenderProgress(prev => {
-        if (prev >= 100) { clearInterval(interval); setRenderPhase('done'); setStep(3); return 100 }
-        return prev + 4
-      })
+    setPosted(false)
+    setDownloadStarted(false)
+    let progress = 0
+    renderIntervalRef.current = setInterval(() => {
+      progress += 4
+      if (progress >= 100) {
+        progress = 100
+        if (renderIntervalRef.current) clearInterval(renderIntervalRef.current)
+        renderIntervalRef.current = null
+        setRenderProgress(100)
+        setRenderPhase('done')
+        setStep(3)
+      } else {
+        setRenderProgress(progress)
+      }
     }, 150)
-  }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (renderIntervalRef.current) clearInterval(renderIntervalRef.current)
+    }
+  }, [])
 
   const handleGenerateCaptions = async () => {
     setCaptionLoading(true)
@@ -182,6 +202,18 @@ export default function CreateVideoSection({ onNavigateToTab, prefillTopic }: Cr
   }
 
   const totalSceneDuration = editedScenes.reduce((sum, s) => sum + (s?.duration_seconds ?? 0), 0)
+
+  const handleDownload = () => {
+    setDownloadStarted(true)
+    setTimeout(() => setDownloadStarted(false), 2500)
+  }
+
+  const handlePostNow = () => {
+    setPosted(true)
+    setTimeout(() => {
+      onNavigateToTab('library')
+    }, 1500)
+  }
 
   return (
     <div className="space-y-6">
@@ -428,14 +460,14 @@ export default function CreateVideoSection({ onNavigateToTab, prefillTopic }: Cr
                 </div>
               </div>
               <div className="p-4 flex flex-wrap gap-2">
-                <Button variant="outline" className="flex-1 min-w-[120px] border-border text-foreground hover:bg-muted gap-2">
-                  <FiDownload className="h-4 w-4" /> Download
+                <Button variant="outline" onClick={handleDownload} disabled={downloadStarted} className="flex-1 min-w-[120px] border-border text-foreground hover:bg-muted gap-2">
+                  {downloadStarted ? <><FiCheck className="h-4 w-4 text-accent" /> Downloading...</> : <><FiDownload className="h-4 w-4" /> Download</>}
                 </Button>
                 <Button variant="outline" onClick={() => onNavigateToTab('scheduler')} className="flex-1 min-w-[120px] border-border text-foreground hover:bg-muted gap-2">
                   <FiCalendar className="h-4 w-4" /> Schedule
                 </Button>
-                <Button className="flex-1 min-w-[120px] bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
-                  <FiArrowRight className="h-4 w-4" /> Post Now
+                <Button onClick={handlePostNow} disabled={posted} className={`flex-1 min-w-[120px] gap-2 ${posted ? 'bg-accent text-accent-foreground' : 'bg-accent text-accent-foreground hover:bg-accent/90'}`}>
+                  {posted ? <><FiCheck className="h-4 w-4" /> Posted</> : <><FiArrowRight className="h-4 w-4" /> Post Now</>}
                 </Button>
               </div>
             </CardContent>

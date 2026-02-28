@@ -113,7 +113,7 @@ export default function Page() {
       case 'library':
         return <LibrarySection />
       case 'analytics':
-        return <AnalyticsSection />
+        return <AnalyticsSection onNavigateToCreate={navigateToCreate} />
       case 'settings':
         return <SettingsSection />
       case 'admin':
