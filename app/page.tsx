@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { FiVideo, FiPlus, FiTrendingUp, FiCalendar, FiGrid, FiBarChart2, FiSettings, FiShield, FiCreditCard, FiUser, FiMenu, FiX } from 'react-icons/fi'
+import { FiVideo, FiPlus, FiTrendingUp, FiCalendar, FiGrid, FiBarChart2, FiSettings, FiShield, FiCreditCard, FiUser, FiMenu, FiX, FiZap, FiBell, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 import DashboardSection from './sections/DashboardSection'
 import CreateVideoSection from './sections/CreateVideoSection'
@@ -33,9 +33,12 @@ class ErrorBoundary extends React.Component<
       return (
         <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
           <div className="text-center p-8 max-w-md">
+            <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+              <FiZap className="h-8 w-8 text-destructive" />
+            </div>
             <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
             <p className="text-muted-foreground mb-4 text-sm">{this.state.error}</p>
-            <button onClick={() => this.setState({ hasError: false, error: '' })} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm">
+            <button onClick={() => this.setState({ hasError: false, error: '' })} className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
               Try again
             </button>
           </div>
@@ -55,22 +58,28 @@ const AGENT_IDS = {
 
 type TabId = 'dashboard' | 'create' | 'niches' | 'scheduler' | 'library' | 'analytics' | 'settings' | 'admin'
 
-const NAV_ITEMS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: FiGrid },
-  { id: 'create', label: 'Create', icon: FiPlus },
-  { id: 'niches', label: 'Niches', icon: FiTrendingUp },
-  { id: 'scheduler', label: 'Scheduler', icon: FiCalendar },
-  { id: 'library', label: 'Library', icon: FiVideo },
-  { id: 'analytics', label: 'Analytics', icon: FiBarChart2 },
-  { id: 'settings', label: 'Settings', icon: FiSettings },
-  { id: 'admin', label: 'Admin', icon: FiShield },
+const NAV_ITEMS: { id: TabId; label: string; icon: React.ElementType; section?: string }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: FiGrid, section: 'Main' },
+  { id: 'create', label: 'Create', icon: FiPlus, section: 'Main' },
+  { id: 'niches', label: 'Niches', icon: FiTrendingUp, section: 'Main' },
+  { id: 'scheduler', label: 'Scheduler', icon: FiCalendar, section: 'Manage' },
+  { id: 'library', label: 'Library', icon: FiVideo, section: 'Manage' },
+  { id: 'analytics', label: 'Analytics', icon: FiBarChart2, section: 'Manage' },
+  { id: 'settings', label: 'Settings', icon: FiSettings, section: 'System' },
+  { id: 'admin', label: 'Admin', icon: FiShield, section: 'System' },
 ]
 
 const AGENTS_INFO = [
-  { id: AGENT_IDS.scriptScenePlanner, name: 'Script & Scene Planner', purpose: 'Generates structured video scripts with scene breakdowns' },
-  { id: AGENT_IDS.trendTopic, name: 'Trend & Topic', purpose: 'Researches trending topics and viral patterns' },
-  { id: AGENT_IDS.captionHashtags, name: 'Caption & Hashtags', purpose: 'Creates platform-optimized captions and hashtag sets' },
-  { id: AGENT_IDS.hookOptimizer, name: 'Hook Optimizer', purpose: 'Analyzes performance and improves hooks' },
+  { id: AGENT_IDS.scriptScenePlanner, name: 'Script & Scene', color: 'bg-primary' },
+  { id: AGENT_IDS.trendTopic, name: 'Trend & Topic', color: 'bg-[hsl(191,97%,70%)]' },
+  { id: AGENT_IDS.captionHashtags, name: 'Caption & Tags', color: 'bg-accent' },
+  { id: AGENT_IDS.hookOptimizer, name: 'Hook Optimizer', color: 'bg-[hsl(326,100%,68%)]' },
+]
+
+const NOTIFICATIONS = [
+  { id: 1, text: 'AI/Tech video hit 45K views', time: '2h ago', type: 'success' },
+  { id: 2, text: 'Scheduled post ready for review', time: '4h ago', type: 'info' },
+  { id: 3, text: 'New trending topic in Crypto', time: '6h ago', type: 'trend' },
 ]
 
 export default function Page() {
@@ -78,6 +87,8 @@ export default function Page() {
   const [prefillTopic, setPrefillTopic] = useState('')
   const [isAdmin, setIsAdmin] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const navigateToTab = (tab: string) => {
     setActiveTab(tab as TabId)
@@ -112,121 +123,227 @@ export default function Page() {
     }
   }
 
+  const sidebarWidth = sidebarCollapsed ? 'w-[68px]' : 'w-[240px]'
+  const mainMargin = sidebarCollapsed ? 'lg:ml-[68px]' : 'lg:ml-[240px]'
+
+  const sections = Array.from(new Set(NAV_ITEMS.map(n => n.section)))
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background text-foreground font-sans">
         {/* Mobile Header */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FiVideo className="h-5 w-5 text-primary" />
-            <span className="font-bold text-foreground tracking-tight">AutoViral</span>
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+              <FiVideo className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <div>
+              <span className="font-bold text-foreground text-sm tracking-tight">AutoViral</span>
+              <span className="text-[9px] text-primary block -mt-0.5 font-medium">STUDIO</span>
+            </div>
           </div>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-foreground">
-            {mobileMenuOpen ? <FiX className="h-5 w-5" /> : <FiMenu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
+              <FiBell className="h-4.5 w-4.5" />
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive animate-live-pulse" />
+            </button>
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-foreground">
+              {mobileMenuOpen ? <FiX className="h-5 w-5" /> : <FiMenu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation Overlay */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-sm pt-16">
-            <div className="p-4 space-y-2">
-              {NAV_ITEMS.map(item => (
-                <button key={item.id} onClick={() => navigateToTab(item.id)} className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${activeTab === item.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </button>
+          <div className="lg:hidden fixed inset-0 z-40 bg-background/98 backdrop-blur-sm pt-16 animate-fade-in-up">
+            <ScrollArea className="h-full">
+              <div className="p-4 space-y-1">
+                {NAV_ITEMS.map(item => (
+                  <button key={item.id} onClick={() => navigateToTab(item.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl text-left transition-all ${activeTab === item.id ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent'}`}>
+                    <item.icon className="h-5 w-5" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                    {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
+                  </button>
+                ))}
+                <Separator className="bg-border my-3" />
+                <div className="flex items-center justify-between p-3">
+                  <span className="text-xs text-muted-foreground">Admin Mode</span>
+                  <Switch checked={isAdmin} onCheckedChange={setIsAdmin} />
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
+        {/* Notification Panel */}
+        {showNotifications && (
+          <div className="fixed top-14 lg:top-16 right-4 z-50 w-80 bg-card border border-border rounded-xl shadow-xl animate-fade-in-up">
+            <div className="p-3 border-b border-border flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
+              <Badge className="bg-destructive/15 text-destructive text-[10px] border-0">{NOTIFICATIONS.length} new</Badge>
+            </div>
+            <div className="p-2 space-y-1 max-h-64 overflow-y-auto">
+              {NOTIFICATIONS.map(n => (
+                <div key={n.id} className="p-2.5 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer">
+                  <p className="text-xs text-foreground">{n.text}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{n.time}</p>
+                </div>
               ))}
+            </div>
+            <div className="p-2 border-t border-border">
+              <button onClick={() => setShowNotifications(false)} className="w-full text-center text-xs text-primary py-1.5 hover:bg-primary/5 rounded-lg transition-colors">
+                Close
+              </button>
             </div>
           </div>
         )}
 
         <div className="flex min-h-screen">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex flex-col w-[220px] bg-card border-r border-border fixed top-0 left-0 h-full z-30">
-            <div className="p-5 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
-                <FiVideo className="h-4 w-4 text-primary" />
+          <aside className={`hidden lg:flex flex-col ${sidebarWidth} bg-card border-r border-border fixed top-0 left-0 h-full z-30 transition-all duration-300`}>
+            {/* Logo */}
+            <div className={`p-4 flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center flex-shrink-0">
+                <FiVideo className="h-4.5 w-4.5 text-primary-foreground" />
               </div>
-              <div>
-                <span className="font-bold text-foreground text-sm tracking-tight">AutoViral</span>
-                <span className="text-[10px] text-muted-foreground block -mt-0.5">Studio</span>
-              </div>
+              {!sidebarCollapsed && (
+                <div className="min-w-0">
+                  <span className="font-bold text-foreground text-sm tracking-tight block">AutoViral</span>
+                  <span className="text-[9px] text-primary font-semibold tracking-widest block -mt-0.5">STUDIO</span>
+                </div>
+              )}
             </div>
 
             <Separator className="bg-border" />
 
-            <ScrollArea className="flex-1 px-3 py-4">
-              <nav className="space-y-1">
-                {NAV_ITEMS.map(item => (
-                  <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-sm transition-all ${activeTab === item.id ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </button>
+            {/* Navigation */}
+            <ScrollArea className="flex-1 px-2.5 py-3">
+              <nav className="space-y-0.5">
+                {sections.map(section => (
+                  <React.Fragment key={section}>
+                    {!sidebarCollapsed && (
+                      <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 px-3 pt-4 pb-1.5 font-semibold">{section}</p>
+                    )}
+                    {NAV_ITEMS.filter(n => n.section === section).map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        title={sidebarCollapsed ? item.label : undefined}
+                        className={`w-full flex items-center gap-3 ${sidebarCollapsed ? 'justify-center px-2' : 'px-3'} py-2.5 rounded-xl text-left text-sm transition-all group relative ${
+                          activeTab === item.id
+                            ? 'bg-primary text-primary-foreground font-medium glow-primary'
+                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                        }`}
+                      >
+                        <item.icon className={`h-4 w-4 flex-shrink-0 ${activeTab === item.id ? '' : 'group-hover:scale-110 transition-transform'}`} />
+                        {!sidebarCollapsed && <span>{item.label}</span>}
+                        {activeTab === item.id && !sidebarCollapsed && (
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/60" />
+                        )}
+                      </button>
+                    ))}
+                  </React.Fragment>
                 ))}
               </nav>
 
-              <Separator className="bg-border my-4" />
-
-              <div className="px-3 space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">AI Agents</p>
-                {AGENTS_INFO.map(agent => (
-                  <div key={agent.id} className="space-y-0.5">
-                    <p className="text-xs font-medium text-foreground">{agent.name}</p>
-                    <p className="text-[10px] text-muted-foreground leading-snug">{agent.purpose}</p>
+              {!sidebarCollapsed && (
+                <>
+                  <Separator className="bg-border my-4" />
+                  <div className="px-3 space-y-2.5">
+                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-semibold">AI Agents</p>
+                    {AGENTS_INFO.map(agent => (
+                      <div key={agent.id} className="flex items-center gap-2.5 py-1">
+                        <div className={`w-2 h-2 rounded-full ${agent.color} flex-shrink-0`} />
+                        <span className="text-[11px] text-muted-foreground truncate">{agent.name}</span>
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent/60 animate-live-pulse flex-shrink-0" />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </ScrollArea>
 
-            <div className="p-4 border-t border-border space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Admin Mode</span>
-                <Switch checked={isAdmin} onCheckedChange={setIsAdmin} />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <FiUser className="h-3.5 w-3.5 text-primary" />
+            {/* Sidebar Footer */}
+            <div className={`border-t border-border ${sidebarCollapsed ? 'p-2' : 'p-3'} space-y-3`}>
+              {/* Collapse Toggle */}
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="w-full flex items-center justify-center p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+              >
+                {sidebarCollapsed ? <FiChevronRight className="h-4 w-4" /> : <FiChevronLeft className="h-4 w-4" />}
+              </button>
+
+              {!sidebarCollapsed && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground">Admin Mode</span>
+                    <Switch checked={isAdmin} onCheckedChange={setIsAdmin} />
+                  </div>
+                  <div className="flex items-center gap-2.5 p-2 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-bold text-white">A</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">Alex Rivera</p>
+                      <p className="text-[10px] text-muted-foreground truncate">Pro Plan</p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {sidebarCollapsed && (
+                <div className="flex justify-center">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">A</span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-foreground truncate">Alex Rivera</p>
-                  <p className="text-[10px] text-muted-foreground truncate">alex@autoviral.studio</p>
-                </div>
-              </div>
+              )}
             </div>
           </aside>
 
           {/* Main Content Area */}
-          <main className="flex-1 lg:ml-[220px]">
+          <main className={`flex-1 ${mainMargin} transition-all duration-300`}>
             {/* Desktop Top Bar */}
-            <header className="hidden lg:flex items-center justify-between px-6 py-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-20">
-              <div>
+            <header className="hidden lg:flex items-center justify-between px-6 py-3.5 border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-20">
+              <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold text-foreground tracking-tight">{NAV_ITEMS.find(n => n.id === activeTab)?.label ?? 'Dashboard'}</h2>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="outline" className="border-border text-muted-foreground text-xs">
-                  <FiCreditCard className="mr-1.5 h-3 w-3" /> 847 credits
+                <Badge variant="outline" className="border-border text-muted-foreground text-xs gap-1.5 px-3 py-1">
+                  <FiCreditCard className="h-3 w-3" /> 847 credits
                 </Badge>
+                <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                  <FiBell className="h-4 w-4" />
+                  <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive animate-live-pulse" />
+                </button>
               </div>
             </header>
 
             {/* Content */}
-            <div className="p-4 lg:p-6 pt-16 lg:pt-6">
+            <div className="p-4 lg:p-6 pt-16 lg:pt-6 pb-20 lg:pb-6">
               {renderActiveSection()}
             </div>
           </main>
         </div>
 
         {/* Mobile Bottom Tab Bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
-          <div className="flex justify-around py-2">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border">
+          <div className="flex justify-around py-1.5">
             {NAV_ITEMS.slice(0, 5).map(item => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }} className={`flex flex-col items-center gap-0.5 px-2 py-1 ${activeTab === item.id ? 'text-primary' : 'text-muted-foreground'}`}>
-                <item.icon className="h-4 w-4" />
-                <span className="text-[9px]">{item.label}</span>
+              <button key={item.id} onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${activeTab === item.id ? 'text-primary' : 'text-muted-foreground'}`}>
+                <div className={`p-1 rounded-lg ${activeTab === item.id ? 'bg-primary/15' : ''}`}>
+                  <item.icon className="h-4 w-4" />
+                </div>
+                <span className={`text-[9px] ${activeTab === item.id ? 'font-semibold' : ''}`}>{item.label}</span>
               </button>
             ))}
           </div>
         </div>
+
+        {/* Click outside to close notifications */}
+        {showNotifications && (
+          <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+        )}
       </div>
     </ErrorBoundary>
   )
