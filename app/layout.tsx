@@ -9,8 +9,8 @@ import { AgentInterceptorProvider } from '@/components/AgentInterceptorProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Next.js App',
-  description: 'Built with Next.js, React, and Tailwind CSS',
+  title: 'AutoViral Studio',
+  description: 'AI-powered short-form video creation platform',
   icons: {
     icon: '/lyzr.png',
   },
@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   const isPaidUser = process.env.IS_PAID_USER === 'true'
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }} suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <IframeLoggerInit />
         <ErrorBoundary>
