@@ -1,0 +1,17 @@
+{
+  "agent_name": "Caption & Hashtags Agent",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "schema": {
+    "platforms": [
+      {
+        "platform": "string",
+        "caption": "string",
+        "hashtags": ["string"],
+        "call_to_action": "string",
+        "best_posting_time": "string"
+      }
+    ]
+  }
+}

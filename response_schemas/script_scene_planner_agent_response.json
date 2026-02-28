@@ -1,0 +1,48 @@
+{
+  "agent_name": "Script & Scene Planner Agent",
+  "agent_id": "69a3270589a7585c80443946",
+  "description": "Generates structured short-form video scripts with hook line, 4-8 scene breakdowns including visual direction, voiceover text per scene, pacing/transition notes, and scene duration allocation.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "hook_line": "string",
+    "total_duration": "number",
+    "music_mood": "string",
+    "pacing_notes": "string",
+    "scenes": [
+      {
+        "scene_number": "number",
+        "visual_type": "string",
+        "visual_description": "string",
+        "voiceover_text": "string",
+        "duration_seconds": "number",
+        "transition": "string"
+      }
+    ]
+  },
+  "example_response": {
+    "hook_line": "sample string",
+    "total_duration": 0,
+    "music_mood": "sample string",
+    "pacing_notes": "sample string",
+    "scenes": [
+      {
+        "scene_number": 0,
+        "visual_type": "sample string",
+        "visual_description": "sample string",
+        "voiceover_text": "sample string",
+        "duration_seconds": 0,
+        "transition": "sample string"
+      }
+    ]
+  },
+  "has_module_outputs": true,
+  "module_outputs_example": {
+    "artifact_files": [
+      {
+        "file_url": "https://example.com/image.png"
+      }
+    ]
+  }
+}

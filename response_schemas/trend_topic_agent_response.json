@@ -1,0 +1,32 @@
+{
+  "agent_name": "Trend & Topic Agent",
+  "agent_id": "69a327053dad68d04a05e74f",
+  "description": "Researches current trending topics, keywords, and viral patterns within a selected niche. Returns 5 ranked topic suggestions with rationale, trend velocity, and content angle recommendations.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "niche": "string",
+    "topics": [
+      {
+        "title": "string",
+        "trend_velocity": "string",
+        "rationale": "string",
+        "content_angle": "string",
+        "interest_level": "number"
+      }
+    ]
+  },
+  "example_response": {
+    "niche": "sample string",
+    "topics": [
+      {
+        "title": "sample string",
+        "trend_velocity": "sample string",
+        "rationale": "sample string",
+        "content_angle": "sample string",
+        "interest_level": 0
+      }
+    ]
+  }
+}

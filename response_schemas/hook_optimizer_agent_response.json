@@ -1,0 +1,60 @@
+{
+  "agent_name": "Hook Optimizer Agent",
+  "agent_id": "69a32706e7d556f541c6d6e5",
+  "description": "Analyzes performance data from posted videos and generates improved hook variations for future content. Provides A/B hook suggestions, best posting time recommendations, and niche-level content strategy insights.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "performance_summary": "string",
+    "improved_hooks": [
+      {
+        "original_hook": "string",
+        "improved_hook": "string",
+        "reasoning": "string"
+      }
+    ],
+    "ab_test_suggestions": [
+      {
+        "hook_a": "string",
+        "hook_b": "string",
+        "test_rationale": "string"
+      }
+    ],
+    "posting_recommendations": "string",
+    "content_strategy": "string",
+    "next_video_suggestions": [
+      {
+        "topic": "string",
+        "hook": "string",
+        "rationale": "string"
+      }
+    ]
+  },
+  "example_response": {
+    "performance_summary": "sample string",
+    "improved_hooks": [
+      {
+        "original_hook": "sample string",
+        "improved_hook": "sample string",
+        "reasoning": "sample string"
+      }
+    ],
+    "ab_test_suggestions": [
+      {
+        "hook_a": "sample string",
+        "hook_b": "sample string",
+        "test_rationale": "sample string"
+      }
+    ],
+    "posting_recommendations": "sample string",
+    "content_strategy": "sample string",
+    "next_video_suggestions": [
+      {
+        "topic": "sample string",
+        "hook": "sample string",
+        "rationale": "sample string"
+      }
+    ]
+  }
+}

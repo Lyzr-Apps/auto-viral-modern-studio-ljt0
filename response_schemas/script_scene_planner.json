@@ -1,0 +1,22 @@
+{
+  "agent_name": "Script & Scene Planner Agent",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "schema": {
+    "hook_line": "string",
+    "total_duration": "number",
+    "music_mood": "string",
+    "pacing_notes": "string",
+    "scenes": [
+      {
+        "scene_number": "number",
+        "visual_type": "string",
+        "visual_description": "string",
+        "voiceover_text": "string",
+        "duration_seconds": "number",
+        "transition": "string"
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "agent_name": "Trend & Topic Agent",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "schema": {
+    "niche": "string",
+    "topics": [
+      {
+        "title": "string",
+        "trend_velocity": "string",
+        "rationale": "string",
+        "content_angle": "string",
+        "interest_level": "number"
+      }
+    ]
+  }
+}

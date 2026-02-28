@@ -1,0 +1,20 @@
+{
+  "agents": {
+    "script_scene_planner": {
+      "agent_id": "69a3270589a7585c80443946",
+      "name": "Script & Scene Planner Agent"
+    },
+    "trend_topic": {
+      "agent_id": "69a327053dad68d04a05e74f",
+      "name": "Trend & Topic Agent"
+    },
+    "caption_hashtags": {
+      "agent_id": "69a32706931679f19b7d6d2b",
+      "name": "Caption & Hashtags Agent"
+    },
+    "hook_optimizer": {
+      "agent_id": "69a32706e7d556f541c6d6e5",
+      "name": "Hook Optimizer Agent"
+    }
+  }
+}

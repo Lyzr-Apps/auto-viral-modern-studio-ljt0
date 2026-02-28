@@ -1,0 +1,32 @@
+{
+  "agent_name": "Hook Optimizer Agent",
+  "agent_type": "json",
+  "accessor": "json",
+  "has_module_outputs": false,
+  "schema": {
+    "performance_summary": "string",
+    "improved_hooks": [
+      {
+        "original_hook": "string",
+        "improved_hook": "string",
+        "reasoning": "string"
+      }
+    ],
+    "ab_test_suggestions": [
+      {
+        "hook_a": "string",
+        "hook_b": "string",
+        "test_rationale": "string"
+      }
+    ],
+    "posting_recommendations": "string",
+    "content_strategy": "string",
+    "next_video_suggestions": [
+      {
+        "topic": "string",
+        "hook": "string",
+        "rationale": "string"
+      }
+    ]
+  }
+}

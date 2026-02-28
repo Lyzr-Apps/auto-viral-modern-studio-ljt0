@@ -1,0 +1,34 @@
+{
+  "agent_name": "Caption & Hashtags Agent",
+  "agent_id": "69a32706931679f19b7d6d2b",
+  "description": "Generates platform-specific optimized captions and hashtag sets for Instagram, Facebook, and TikTok based on the video script, niche, and target audience.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "platforms": [
+      {
+        "platform": "string",
+        "caption": "string",
+        "hashtags": [
+          "string"
+        ],
+        "call_to_action": "string",
+        "best_posting_time": "string"
+      }
+    ]
+  },
+  "example_response": {
+    "platforms": [
+      {
+        "platform": "sample string",
+        "caption": "sample string",
+        "hashtags": [
+          "sample string"
+        ],
+        "call_to_action": "sample string",
+        "best_posting_time": "sample string"
+      }
+    ]
+  }
+}
